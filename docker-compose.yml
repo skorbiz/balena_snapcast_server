@@ -1,0 +1,17 @@
+version: "2.1"
+
+services:
+  snapclient:
+    image: docker.io/saiyato/snapclient:latest
+    hostname: snapclient
+    restart: unless-stopped
+    privileged: true
+    labels:
+      io.balena.features.dbus: '1'
+      io.balena.features.kernel-modules: '1'
+      io.balena.features.firmware: '1'
+    command: ["-h", "192.168.1.38", "-s", "hw:1,0", "--hostID", "pi-zero-beoplay"]
+    devices:
+      - "/dev/snd:/dev/snd"
+    group_add:
+      - audio

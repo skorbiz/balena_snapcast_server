@@ -1,0 +1,11 @@
+name: balena_snapcast_server
+type: sw.application
+description: Snapcast client for multiroom audio
+assets:
+  repository:
+    type: blob.asset
+    data:
+      url: https://github.com/skorbiz/balena_snapcast_server
+configuration:
+  audio:
+    output: usb
