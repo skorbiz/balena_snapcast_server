@@ -2,7 +2,9 @@ version: "2.1"
 
 services:
   snapclient:
-    image: docker.io/saiyato/snapclient:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     hostname: snapclient
     restart: unless-stopped
     privileged: true

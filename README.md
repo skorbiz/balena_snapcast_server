@@ -1,9 +1,10 @@
 # balena_snapcast_server
-A project to use balena to deploy and manage multiroom music using snapcast.
+A project to use Balena to deploy and manage multiroom music using snapcast.
 
-The snapcast docker image is based on:
-badaix/snapcast
-saiyato/snapclient
+The snapclient is installed from official pre-built packages from the snapcast repository:
+https://github.com/snapcast/snapcast
+
+The Dockerfile uses debian:bookworm-slim as the base image and installs the official snapclient .deb package for the appropriate architecture (armhf for Raspberry Pi Zero 2 W).
 
 This repo add a few changes to make it compatible with balena and work for my specific setup.
 
@@ -30,3 +31,20 @@ balena fleet name: iotsound
 
 Browser to the snapcast server:
 http://192.168.1.38:1780
+
+
+
+# Alternative imge
+An alternative to the current docker file could be to use the prebuild image here:
+image: docker.io/saiyato/snapclient:latest
+The image is based on .... which is a much small image.
+
+
+# About Snapcast
+Todo add something here... 3-5 lines and a link
+
+# About sendspin
+Todo add something here... 3-5 lines and a link
+
+# About Balena
+Todo add somthing here... 3-5 lines and a link
