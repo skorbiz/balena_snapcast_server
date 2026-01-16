@@ -1,0 +1,37 @@
+FROM balenalib/raspberrypi0-2w-64-debian:bookworm
+
+# Install dependencies for sendspin
+RUN install_packages \
+    python3 \
+    python3-pip \
+    python3-venv \
+    pulseaudio-utils \
+    libasound2-plugins \
+    libportaudio2 \
+    avahi-daemon \
+    dbus \
+    curl
+
+# Configure ALSA to use PulseAudio
+RUN echo 'pcm.pulse { type pulse } ctl.pulse { type pulse } pcm.!default { type pulse } ctl.!default { type pulse }' | sed 's/} /}\n/g' > /etc/asound.conf
+
+# Install uv (modern Python package installer) and sendspin
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    export PATH="/root/.local/bin:${PATH}" && \
+    uv tool install sendspin
+
+# Add uv and tools to PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Add sendspin to PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Set PulseAudio server
+ENV PULSE_SERVER=unix:/run/pulse/native
+
+# Run sendspin daemon in background mode
+# Using daemon mode for headless operation
+# Auto-discovers Sendspin servers on the network via mDNS
+# Increased buffer for better sync across devices
+CMD ["sendspin", "daemon", "--name", "pi-zero-beoplay", "--log-level", "INFO"]
+

@@ -5,6 +5,7 @@ description: Snapcast client for multiroom audio
 data:
   applicationEnvironmentVariables:
     - SNAPCAST_VERSION: 0.34.0
+    - SOUND_VOLUME: 180
   defaultDeviceType: raspberrypi0-2w-64
   supportedDeviceTypes:
     - raspberrypi0-2w-64

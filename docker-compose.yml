@@ -1,19 +1,59 @@
 version: "2.1"
 
 services:
-  snapclient:
+  pulseaudio:
     build:
       context: .
-      dockerfile: Dockerfile
-    hostname: snapclient
+      dockerfile: Dockerfile.pulseaudio
+    hostname: pulseaudio
     restart: unless-stopped
     privileged: true
     labels:
       io.balena.features.dbus: '1'
       io.balena.features.kernel-modules: '1'
       io.balena.features.firmware: '1'
-    command: ["-h", "192.168.1.38", "-s", "hw:1,0", "--hostID", "pi-zero-beoplay"]
     devices:
       - "/dev/snd:/dev/snd"
     group_add:
       - audio
+    volumes:
+      - pulse-socket:/run/pulse
+    environment:
+      - PULSE_RUNTIME_PATH=/run/pulse
+      - SOUND_VOLUME=${SOUND_VOLUME:-180}
+
+  snapclient:
+    build:
+      context: .
+      dockerfile: Dockerfile.snapcast
+    hostname: snapclient
+    restart: unless-stopped
+    labels:
+      io.balena.features.dbus: '1'
+    command: ["-h", "192.168.1.38", "-s", "pulse", "--hostID", "pi-zero-beoplay"]
+    volumes:
+      - pulse-socket:/run/pulse
+    environment:
+      - PULSE_SERVER=unix:/run/pulse/native
+    depends_on:
+      - pulseaudio
+
+  sendspin:
+    build:
+      context: .
+      dockerfile: Dockerfile.sendspin
+    hostname: sendspin
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      io.balena.features.dbus: '1'
+      io.balena.features.avahi: '1'
+    volumes:
+      - pulse-socket:/run/pulse
+    environment:
+      - PULSE_SERVER=unix:/run/pulse/native
+    depends_on:
+      - pulseaudio
+
+volumes:
+  pulse-socket:

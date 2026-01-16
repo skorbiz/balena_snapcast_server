@@ -1,0 +1,63 @@
+FROM balenalib/raspberrypi0-2w-64-debian:bookworm
+
+# Install PulseAudio and ALSA
+RUN install_packages \
+    pulseaudio \
+    pulseaudio-utils \
+    alsa-utils \
+    dbus \
+    sox
+
+# Create directories and set permissions
+RUN mkdir -p /run/pulse /var/run/pulse /var/lib/pulse && \
+    chown -R pulse:pulse /run/pulse /var/run/pulse /var/lib/pulse
+
+# Create PulseAudio system configuration
+# Use detect to auto-detect sound cards (works better in containers than udev)
+RUN echo '#!/usr/bin/pulseaudio -nF\n\
+.fail\n\
+load-module module-native-protocol-unix auth-anonymous=1 socket=/run/pulse/native\n\
+load-module module-detect\n\
+load-module module-always-sink\n\
+load-module module-suspend-on-idle timeout=0\n\
+load-module module-native-protocol-tcp auth-anonymous=1 auth-ip-acl=127.0.0.1;172.16.0.0/12;192.168.0.0/16\n\
+.nofail\n' > /etc/pulse/system.pa
+
+# Allow pulse user to access audio devices
+RUN usermod -a -G audio pulse
+
+# Create startup script that removes stale PID file before starting
+RUN echo '#!/bin/bash\n\
+rm -f /run/pulse/pid /var/run/pulse/pid\n\
+pulseaudio --system --disallow-exit --disallow-module-loading=0 -v &\n\
+PULSE_PID=$!\n\
+sleep 3\n\
+# Set ALSA hardware mixer to maximum (no quality loss)\n\
+echo "Setting ALSA hardware volume to 100%..."\n\
+amixer -c 1 sset "Speaker" 100% unmute 2>/dev/null || true\n\
+amixer -c 1 sset "PCM" 100% unmute 2>/dev/null || true\n\
+amixer -c 1 sset "Master" 100% unmute 2>/dev/null || true\n\
+# Set PulseAudio volume (can go above 100% = 65536)\n\
+VOLUME=${SOUND_VOLUME:-80}\n\
+if [ "$VOLUME" -gt 100 ]; then\n\
+  # Above 100%: calculate as percentage of max (153% = 100000)\n\
+  PA_VOLUME=$((VOLUME * 655))\n\
+else\n\
+  # Normal percentage\n\
+  PA_VOLUME="${VOLUME}%"\n\
+fi\n\
+pactl set-sink-volume @DEFAULT_SINK@ $PA_VOLUME\n\
+pactl set-sink-mute @DEFAULT_SINK@ 0\n\
+echo "ALSA hardware: 100%, PulseAudio: ${VOLUME}%"\n\
+wait $PULSE_PID\n' > /start.sh && \
+    chmod +x /start.sh
+
+# Copy audio test script
+COPY test-audio.sh /test-audio.sh
+RUN chmod +x /test-audio.sh
+
+COPY play-tone.sh /play-tone.sh
+RUN chmod +x /play-tone.sh
+
+# Start PulseAudio in system mode (with cleanup of stale PID file)
+CMD ["/start.sh"]

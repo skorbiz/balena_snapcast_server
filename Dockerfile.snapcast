@@ -7,8 +7,12 @@ ARG SNAPCAST_VERSION=0.34.0
 RUN install_packages \
     wget \
     ca-certificates \
-    alsa-utils \
+    pulseaudio-utils \
+    libasound2-plugins \
     avahi-daemon
+
+# Configure ALSA to use PulseAudio
+RUN echo 'pcm.pulse { type pulse } ctl.pulse { type pulse } pcm.!default { type pulse } ctl.!default { type pulse }' | sed 's/} /}\n/g' > /etc/asound.conf
 
 # Download and install the appropriate snapclient package
 # Automatically detects architecture (arm64 for 64-bit balenaOS, armhf for 32-bit)
