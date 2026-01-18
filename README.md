@@ -5,35 +5,32 @@ A Balena stack for multiroom audio using Snapcast with Spotify Connect support.
 ## Overview
 
 This project deploys a complete multiroom audio system:
-- **Snapserver** receives audio from Spotify Connect
+- **go-librespot** provides Spotify Connect endpoint
+- **Snapserver** receives audio and distributes to clients
 - **Snapclients** play synchronized audio on speakers across your network
 - **SendSpin** (optional) alternative Spotify Connect client
-- Works on Raspberry Pi Zero 2 W, Pi 3, Pi 4, Pi 5
+- Works on Raspberry Pi Zero 2 W and probably Pi 3, Pi 4, Pi 5
 
 ```mermaid
 flowchart LR
-    subgraph server["Server Device (ENABLE_SERVER=on)"]
-        spotify[Spotify App]
-        librespot[librespot<br/>Spotify Connect]
-        snapserver[snapserver<br/>:1704]
-        spotify -->|Spotify Connect| librespot
-        librespot -->|FIFO pipe| snapserver
+    subgraph server["Server Device"]
+        direction LR
+        spotify[Spotify App] -->|Connect| librespot[go-librespot]
+        librespot -->|FIFO| snapserver[snapserver]
     end
     
-    subgraph client["Client Device(s)"]
-        snapclient[snapclient]
-        sendspin[sendspin<br/>optional]
-        pulse[PulseAudio]
-        usb[USB Sound Card]
-        speaker[Speaker]
-        snapclient --> pulse
-        sendspin -.->|if enabled| pulse
-        pulse --> usb
-        usb --> speaker
+    subgraph client1["Client 1"]
+        direction LR
+        sc1[snapclient] --> pa1[PulseAudio] --> spk1[🔊]
     end
     
-    snapserver -->|network<br/>synced audio| snapclient
-    spotify -.->|alternative| sendspin
+    subgraph client2["Client 2"]
+        direction LR
+        sc2[snapclient] --> pa2[PulseAudio] --> spk2[🔊]
+    end
+    
+    snapserver -->|synced| sc1
+    snapserver -->|synced| sc2
 ```
 
 ## Components
