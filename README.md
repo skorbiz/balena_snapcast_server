@@ -63,19 +63,27 @@ Configure these in the Balena dashboard:
 | `ENABLE_SENDSPIN` | `off` | Set to `on` to use SendSpin instead of Snapcast |
 | `SNAPSERVER_HOST` | `snapserver` | IP/hostname of the server (for client devices) |
 | `SNAPCLIENT_ID` | `snapclient` | Client name shown in Snapserver web UI |
-
-### Audio Settings
-
-| Variable | Default | Description |
-|----------|---------|-------------|
 | `SOUND_VOLUME` | `120` | PulseAudio volume (100 = 100%, 150 = amplified) |
 | `SPOTIFY_DEVICE_NAME` | `Snapcast` | Name shown in Spotify Connect |
-
-### Debug/Testing
-
-| Variable | Default | Description |
-|----------|---------|-------------|
 | `AUDIO_TEST` | `off` | Set to `on` to play continuous test tone with sync clap |
+
+### Typical Setup
+
+**Server device** (e.g., always-on Pi):
+```
+ENABLE_SERVER=on
+SPOTIFY_DEVICE_NAME=Living Room
+SOUND_VOLUME=100
+```
+
+**Client devices** (e.g., speakers around the house):
+```
+ENABLE_SERVER=off
+SNAPSERVER_HOST=192.168.1.100
+SNAPCLIENT_ID=Kitchen
+SOUND_VOLUME=120
+```
+
 
 ## Services
 
@@ -107,9 +115,6 @@ For mobile control, use the [Snapcast Android app](https://play.google.com/store
 - Adjust volumes on the go
 - Monitor connection status
 
-### SendSpin Alternative
-
-[SendSpin](https://github.com/kevinykchan/sendspin) is an alternative Spotify Connect client that outputs directly to PulseAudio/ALSA without using Snapcast. Enable it with `ENABLE_SENDSPIN=on` if you prefer a simpler single-device setup without multiroom sync.
 
 ## Ports
 
@@ -119,22 +124,6 @@ For mobile control, use the [Snapcast Android app](https://play.google.com/store
 | 1705 | TCP | Snapcast control |
 | 1780 | HTTP | Snapserver web UI |
 
-## Typical Setup
-
-**Server device** (e.g., always-on Pi):
-```
-ENABLE_SERVER=on
-SPOTIFY_DEVICE_NAME=Living Room
-SOUND_VOLUME=100
-```
-
-**Client devices** (e.g., speakers around the house):
-```
-ENABLE_SERVER=off
-SNAPSERVER_HOST=192.168.1.100
-SNAPCLIENT_ID=Kitchen
-SOUND_VOLUME=120
-```
 
 ## Hardware
 
