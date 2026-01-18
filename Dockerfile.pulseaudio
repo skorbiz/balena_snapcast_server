@@ -38,7 +38,7 @@ amixer -c 1 sset "Speaker" 100% unmute 2>/dev/null || true\n\
 amixer -c 1 sset "PCM" 100% unmute 2>/dev/null || true\n\
 amixer -c 1 sset "Master" 100% unmute 2>/dev/null || true\n\
 # Set PulseAudio volume (can go above 100% = 65536)\n\
-VOLUME=${SOUND_VOLUME:-80}\n\
+VOLUME=${SOUND_VOLUME:-120}\n\
 if [ "$VOLUME" -gt 100 ]; then\n\
   # Above 100%: calculate as percentage of max (153% = 100000)\n\
   PA_VOLUME=$((VOLUME * 655))\n\

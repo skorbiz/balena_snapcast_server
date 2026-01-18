@@ -8,7 +8,7 @@ data:
     - SPOTIFY_DEVICE_NAME: Snapcast
     - SNAPCLIENT_ID: snapclient
     - AUDIO_TEST: off
-    - ENABLE_SERVER: on    
+    - ENABLE_SERVER: on
     - ENABLE_SENDSPIN: off  
   defaultDeviceType: raspberrypi0-2w-64
   supportedDeviceTypes:

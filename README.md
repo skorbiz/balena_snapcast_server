@@ -11,7 +11,7 @@ This project deploys a complete multiroom audio system:
 - Works on Raspberry Pi Zero 2 W, Pi 3, Pi 4, Pi 5
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph server["Server Device (ENABLE_SERVER=on)"]
         spotify[Spotify App]
         librespot[librespot<br/>Spotify Connect]
@@ -63,7 +63,7 @@ Configure these in the Balena dashboard:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `ENABLE_SERVER` | `off` | Set to `on` on one device to run snapserver + librespot |
+| `ENABLE_SERVER` | `on` | Set to `off` on client-only devices |
 | `ENABLE_SENDSPIN` | `off` | Set to `on` to use SendSpin instead of Snapcast |
 | `SNAPSERVER_HOST` | `snapserver` | IP/hostname of the server (for client devices) |
 | `SNAPCLIENT_ID` | `snapclient` | Client name shown in Snapserver web UI |
@@ -196,8 +196,7 @@ systemctl restart balena
 This project was created after existing solutions that didn't quite work for me:
 
 - **IOTSound**: Seemed abandoned and failed to start a Snapcast client properly. 
-- **Older Snapcast-on-Balena setups**: Alpine-based Docker images (like `docker.io/saiyato/snapclient:latest`) were small but required building from source and were behind current Snapcast versions
-
+- **Older Snapcast-on-Balena setups**: Alpine-based Docker images (like `docker.io/saiyato/snapclient:latest`) were small but required building from source and were behind current Snapcast versions. Alpine gives significantly smaller images though.
 
 ## License
 
