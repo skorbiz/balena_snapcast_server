@@ -8,8 +8,7 @@ This project deploys a complete multiroom audio system:
 - **go-librespot** provides Spotify Connect endpoint
 - **Snapserver** receives audio and distributes to clients
 - **Snapclients** play synchronized audio on speakers across your network
-- **SendSpin** (optional) alternative Spotify Connect client
-- Works on Raspberry Pi Zero 2 W and probably Pi 3, Pi 4, Pi 5
+- **SendSpin** (optional) Alternative pipeline used by Home Assisant/Music Assistant
 
 ```mermaid
 flowchart LR
