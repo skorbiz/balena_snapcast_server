@@ -23,4 +23,7 @@ RUN ARCH=$(dpkg --print-architecture) && \
     install_packages /tmp/snapclient.deb && \
     rm /tmp/snapclient.deb
 
-ENTRYPOINT ["/usr/bin/snapclient"]
+COPY snapclient-entrypoint.sh /usr/local/bin/snapclient-entrypoint.sh
+RUN chmod +x /usr/local/bin/snapclient-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/snapclient-entrypoint.sh"]

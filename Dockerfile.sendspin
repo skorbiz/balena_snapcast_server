@@ -29,9 +29,8 @@ ENV PATH="/root/.local/bin:${PATH}"
 # Set PulseAudio server
 ENV PULSE_SERVER=unix:/run/pulse/native
 
-# Run sendspin daemon in background mode
-# Using daemon mode for headless operation
-# Auto-discovers Sendspin servers on the network via mDNS
-# Increased buffer for better sync across devices
-CMD ["sendspin", "daemon", "--name", "pi-zero-beoplay", "--log-level", "INFO"]
+COPY sendspin-entrypoint.sh /usr/local/bin/sendspin-entrypoint.sh
+RUN chmod +x /usr/local/bin/sendspin-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/sendspin-entrypoint.sh"]
 

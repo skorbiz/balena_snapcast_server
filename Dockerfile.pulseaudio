@@ -52,12 +52,5 @@ echo "ALSA hardware: 100%, PulseAudio: ${VOLUME}%"\n\
 wait $PULSE_PID\n' > /start.sh && \
     chmod +x /start.sh
 
-# Copy audio test script
-COPY test-audio.sh /test-audio.sh
-RUN chmod +x /test-audio.sh
-
-COPY play-tone.sh /play-tone.sh
-RUN chmod +x /play-tone.sh
-
 # Start PulseAudio in system mode (with cleanup of stale PID file)
 CMD ["/start.sh"]

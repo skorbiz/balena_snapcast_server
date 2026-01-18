@@ -1,0 +1,28 @@
+FROM balenalib/raspberrypi0-2w-64-debian:bookworm
+
+ARG GOLIBRESPOT_VERSION=0.6.2
+
+RUN install_packages \
+    ca-certificates \
+    curl \
+    libasound2
+
+RUN ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+      arm64) ASSET="go-librespot_linux_arm64.tar.gz" ;; \
+      armhf) ASSET="go-librespot_linux_armv6.tar.gz" ;; \
+      amd64) ASSET="go-librespot_linux_x86_64.tar.gz" ;; \
+      *) echo "Unsupported arch: $ARCH" >&2; exit 1 ;; \
+    esac && \
+    curl -LsSf -o /tmp/go-librespot.tgz \
+      "https://github.com/devgianlu/go-librespot/releases/download/v${GOLIBRESPOT_VERSION}/${ASSET}" && \
+    tar -xzf /tmp/go-librespot.tgz -C /usr/local/bin go-librespot && \
+    chmod +x /usr/local/bin/go-librespot && \
+    rm /tmp/go-librespot.tgz
+
+COPY librespot-config.yml /defaults/librespot-config.yml
+COPY librespot-entrypoint.sh /usr/local/bin/librespot-entrypoint.sh
+RUN chmod +x /usr/local/bin/librespot-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/librespot-entrypoint.sh"]
+CMD ["go-librespot", "--config_dir", "/config"]

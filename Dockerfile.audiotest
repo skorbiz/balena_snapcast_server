@@ -1,0 +1,11 @@
+FROM balenalib/raspberrypi0-2w-64-debian:bookworm
+
+RUN install_packages \
+    pulseaudio-utils \
+    alsa-utils \
+    sox
+
+COPY audiotest.sh /audiotest.sh
+RUN chmod +x /audiotest.sh
+
+CMD ["/audiotest.sh"]

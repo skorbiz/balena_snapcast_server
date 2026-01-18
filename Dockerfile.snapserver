@@ -1,0 +1,20 @@
+FROM balenalib/raspberrypi0-2w-64-debian:bookworm
+
+ARG SNAPCAST_VERSION=0.34.0
+
+RUN install_packages \
+    wget \
+    ca-certificates
+
+RUN ARCH=$(dpkg --print-architecture) && \
+    wget -O /tmp/snapserver.deb \
+    "https://github.com/snapcast/snapcast/releases/download/v${SNAPCAST_VERSION}/snapserver_${SNAPCAST_VERSION}-1_${ARCH}_bookworm.deb" && \
+    install_packages /tmp/snapserver.deb && \
+    rm /tmp/snapserver.deb
+
+COPY snapserver.conf /etc/snapserver.conf
+COPY snapserver-entrypoint.sh /usr/local/bin/snapserver-entrypoint.sh
+RUN chmod +x /usr/local/bin/snapserver-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/snapserver-entrypoint.sh"]
+CMD ["snapserver", "-c", "/etc/snapserver.conf"]

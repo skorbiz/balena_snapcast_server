@@ -1,0 +1,13 @@
+zeroconf_enabled: true
+zeroconf_backend: builtin
+credentials:
+  type: zeroconf
+  zeroconf:
+    persist_credentials: false
+
+device_name: "__DEVICE_NAME__"
+device_type: speaker
+audio_backend: pipe
+audio_output_pipe: /run/snapserver/spotify
+audio_output_pipe_format: s16le
+bitrate: 320

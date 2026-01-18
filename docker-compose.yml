@@ -20,21 +20,37 @@ services:
       - pulse-socket:/run/pulse
     environment:
       - PULSE_RUNTIME_PATH=/run/pulse
-      - SOUND_VOLUME=${SOUND_VOLUME:-180}
+      - SOUND_VOLUME
 
-  snapclient:
+  audiotest:
     build:
       context: .
-      dockerfile: Dockerfile.snapcast
-    hostname: snapclient
-    restart: unless-stopped
-    labels:
-      io.balena.features.dbus: '1'
-    command: ["-h", "192.168.1.38", "-s", "pulse", "--hostID", "pi-zero-beoplay"]
+      dockerfile: Dockerfile.audiotest
+    hostname: audiotest
+    restart: on-failure
     volumes:
       - pulse-socket:/run/pulse
     environment:
       - PULSE_SERVER=unix:/run/pulse/native
+      - AUDIO_TEST
+    depends_on:
+      - pulseaudio
+
+  snapclient:
+    build:
+      context: .
+      dockerfile: Dockerfile.snapclient
+    hostname: snapclient
+    restart: unless-stopped
+    labels:
+      io.balena.features.dbus: '1'
+    command: ["-s", "pulse"]
+    volumes:
+      - pulse-socket:/run/pulse
+    environment:
+      - PULSE_SERVER=unix:/run/pulse/native
+      - SNAPSERVER_HOST
+      - SNAPCLIENT_ID
     depends_on:
       - pulseaudio
 
@@ -43,7 +59,7 @@ services:
       context: .
       dockerfile: Dockerfile.sendspin
     hostname: sendspin
-    restart: unless-stopped
+    restart: on-failure
     network_mode: host
     labels:
       io.balena.features.dbus: '1'
@@ -52,8 +68,54 @@ services:
       - pulse-socket:/run/pulse
     environment:
       - PULSE_SERVER=unix:/run/pulse/native
+      - ENABLE_SENDSPIN
     depends_on:
       - pulseaudio
 
+
+  snapserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.snapserver
+    hostname: snapserver
+    restart: on-failure
+    ports:
+      - "1704:1704"
+      - "1705:1705"
+      - "1780:1780"
+    volumes:
+      - snapserver-pipe:/run/snapserver
+      - snapserver-data:/var/lib/snapserver
+    environment:
+      - ENABLE_SERVER
+
+
+  librespot:
+    build:
+      context: .
+      dockerfile: Dockerfile.librespot
+    hostname: librespot
+    restart: on-failure
+    network_mode: host
+    volumes:
+      - snapserver-pipe:/run/snapserver
+    labels:
+      io.balena.features.avahi: '1'
+    environment:
+      - SPOTIFY_DEVICE_NAME
+      - ENABLE_SERVER
+    depends_on:
+      - snapserver
+
 volumes:
   pulse-socket:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  snapserver-pipe:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  snapserver-data:

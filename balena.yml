@@ -1,11 +1,15 @@
 name: balena_snapcast_server
 version: 0.0.0
 type: sw.application
-description: Snapcast client for multiroom audio
+description: Snapcast client/server for multiroom audio (optional SendSpin client)
 data:
   applicationEnvironmentVariables:
-    - SNAPCAST_VERSION: 0.34.0
-    - SOUND_VOLUME: 180
+    - SOUND_VOLUME: 120
+    - SPOTIFY_DEVICE_NAME: Snapcast
+    - SNAPCLIENT_ID: snapclient
+    - AUDIO_TEST: off
+    - ENABLE_SERVER: on    
+    - ENABLE_SENDSPIN: off  
   defaultDeviceType: raspberrypi0-2w-64
   supportedDeviceTypes:
     - raspberrypi0-2w-64
